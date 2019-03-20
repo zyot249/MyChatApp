@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1007508146794",
+    "firebase_url": "https://mychatapp-ndd24091998.firebaseio.com",
+    "project_id": "mychatapp-ndd24091998",
+    "storage_bucket": "mychatapp-ndd24091998.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1007508146794:android:cafb5131af92cf4c",
+        "android_client_info": {
+          "package_name": "com.shyn.zyot.wind.mychatapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1007508146794-9o2k4kf2cnnuqpldlrfl4rj2tm4p4rqa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJRkEcst6ElvyO71TgBDnSrPuXu2B2vA4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
