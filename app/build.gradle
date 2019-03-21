@@ -32,6 +32,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:16.0.8'
     implementation 'com.google.firebase:firebase-auth:16.2.0'
 
+    //realtime database firebase
+    implementation 'com.google.firebase:firebase-database:16.1.0'
+
     //circle image view
     implementation 'de.hdodenhof:circleimageview:3.0.0'
 
