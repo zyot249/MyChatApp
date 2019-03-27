@@ -41,6 +41,7 @@ public class RegisterActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Register");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+
         // find view
         edtName = findViewById(R.id.edtName);
         edtEmail = findViewById(R.id.edtEmail);

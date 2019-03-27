@@ -1,7 +1,5 @@
 package com.shyn.zyot.wind.mychatapp.Model;
 
-import java.util.List;
-
 public class User {
     private String id;
     private String username;

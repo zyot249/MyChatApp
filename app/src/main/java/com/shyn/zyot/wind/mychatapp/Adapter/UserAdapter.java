@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.shyn.zyot.wind.mychatapp.MessageActivity;
 import com.shyn.zyot.wind.mychatapp.Model.User;
 import com.shyn.zyot.wind.mychatapp.R;
 
@@ -38,7 +39,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
-        User user = users.get(position);
+        final User user = users.get(position);
         holder.tvUsername.setText(user.getUsername());
         if (user.getImageUrl().equals("default"))
             holder.userImage.setImageResource(R.mipmap.ic_launcher_round);
@@ -51,6 +52,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             holder.statusOn.setVisibility(View.GONE);
             holder.statusOff.setVisibility(View.VISIBLE);
         }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, MessageActivity.class);
+                intent.putExtra("receiverID", user.getId());
+                mContext.startActivity(intent);
+            }
+        });
 
     }
 
