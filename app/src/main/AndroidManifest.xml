@@ -16,15 +16,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".StartActivity" />
-        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".StartActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleTop" />
         <activity
             android:name=".LoginActivity"
             android:parentActivityName=".StartActivity" />
         <activity
             android:name=".RegisterActivity"
             android:parentActivityName=".StartActivity" />
-        <activity android:name=".MessageActivity"></activity>
+        <activity
+            android:name=".MessageActivity"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

@@ -8,12 +8,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.shyn.zyot.wind.mychatapp.MessageActivity;
+import com.shyn.zyot.wind.mychatapp.Model.Room;
 import com.shyn.zyot.wind.mychatapp.Model.User;
 import com.shyn.zyot.wind.mychatapp.R;
 
+import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -56,9 +66,29 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, MessageActivity.class);
-                intent.putExtra("receiverID", user.getId());
-                mContext.startActivity(intent);
+                FirebaseUser fuser = FirebaseAuth.getInstance().getCurrentUser();
+                DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference("UserRooms").child(fuser.getUid()).child(user.getId());
+                dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        String roomID = "";
+                        Room room = dataSnapshot.getValue(Room.class);
+                        if (room != null)
+                            roomID = room.getRoomID();
+                        Intent intent = new Intent(mContext,MessageActivity.class);
+                        intent.putExtra("receiverID", user.getId());
+                        if (roomID.isEmpty()) {
+                            intent.putExtra("roomID", "");
+                        } else intent.putExtra("roomID", roomID);
+                        mContext.startActivity(intent);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
             }
         });
 

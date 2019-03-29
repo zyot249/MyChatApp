@@ -18,7 +18,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class RegisterActivity extends AppCompatActivity {
@@ -86,13 +89,19 @@ public class RegisterActivity extends AppCompatActivity {
                             // Write database
                             dbReference = FirebaseDatabase.getInstance().getReference("Users").child(userID);
 
-                            HashMap<String, String> hashMap = new HashMap<>();
+                            HashMap<String, Object> hashMap = new HashMap<>();
+                            HashMap<String, String> chatedUser = new HashMap<>();
                             hashMap.put("id",userID);
                             hashMap.put("username",name);
                             hashMap.put("imageUrl","default");
                             hashMap.put("status", "offline");
                             hashMap.put("search", name.toLowerCase());
 
+
+//                            chatedUser.put("chatUID","asdsadasdas");
+//                            chatedUser.put("UserUID", "ddasdasdasdas");
+//
+//                            hashMap.put("chatedUser",chatedUser);
 
                             dbReference.setValue(hashMap).addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<Void>() {
                                 @Override
