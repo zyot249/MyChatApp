@@ -87,7 +87,7 @@ public class MessageActivity extends AppCompatActivity {
         final String senderID = fuser.getUid();
         if (getRoomID == null || getRoomID.equals("")) {
             // create room for sender
-            getRoomID = createRoom(senderID,receiverID);
+            getRoomID = createRoom(senderID, receiverID);
         }
 
         // send message
@@ -119,6 +119,32 @@ public class MessageActivity extends AppCompatActivity {
                     Glide.with(MessageActivity.this).load(user.getImageUrl()).into(receiverImage);
 
                 readMessage(user.getImageUrl(), roomID);
+                setLastMessage(roomID);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void setLastMessage(final String roomID) {
+        dbReference = FirebaseDatabase.getInstance().getReference("Messages").child(roomID);
+        dbReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String lastMessageID = "";
+                // get the latest msg
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    lastMessageID = snapshot.getKey();
+                }
+
+                // update last msg of room
+                DatabaseReference roomDetail = FirebaseDatabase.getInstance().getReference("RoomDetail").child(roomID);
+                HashMap<String, Object> hashMap = new HashMap<>();
+                hashMap.put("lastMsgID",lastMessageID);
+                roomDetail.updateChildren(hashMap);
             }
 
             @Override

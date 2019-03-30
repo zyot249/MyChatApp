@@ -18,7 +18,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHoler> {
+public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
     private static final int MSG_TYPE_LEFT = 0;
     private static final int MSG_TYPE_RIGHT = 1;
 
@@ -26,7 +26,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private List<Message> mMessages;
     private String senderImageUrl;
 
-    FirebaseUser fuser;
+    private FirebaseUser fuser;
 
     public MessageAdapter(Context mContext, List<Message> mMessages, String senderImageUrl) {
         this.mContext = mContext;
@@ -36,18 +36,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     @NonNull
     @Override
-    public MessageViewHoler onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == MSG_TYPE_LEFT) {
             View view = LayoutInflater.from(mContext).inflate(R.layout.list_item_left_msg, parent, false);
-            return new MessageViewHoler(view);
+            return new MessageViewHolder(view);
         } else {
             View view = LayoutInflater.from(mContext).inflate(R.layout.list_item_right_msg, parent, false);
-            return new MessageViewHoler(view);
+            return new MessageViewHolder(view);
         }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MessageViewHoler holder, int position) {
+    public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
         Message message = mMessages.get(position);
         holder.tvMessage.setText(message.getMessage());
         if (senderImageUrl.equals("default"))
@@ -61,12 +61,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         return mMessages.size();
     }
 
-    public class MessageViewHoler extends RecyclerView.ViewHolder {
+    public class MessageViewHolder extends RecyclerView.ViewHolder {
 
         CircleImageView userImage;
         TextView tvMessage;
 
-        public MessageViewHoler(View itemView) {
+        public MessageViewHolder(View itemView) {
             super(itemView);
             userImage = itemView.findViewById(R.id.userImage);
             tvMessage = itemView.findViewById(R.id.tvMessage);

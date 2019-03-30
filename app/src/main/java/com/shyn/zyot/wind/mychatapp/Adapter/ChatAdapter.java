@@ -18,11 +18,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.shyn.zyot.wind.mychatapp.MessageActivity;
+import com.shyn.zyot.wind.mychatapp.Model.Message;
 import com.shyn.zyot.wind.mychatapp.Model.Room;
 import com.shyn.zyot.wind.mychatapp.Model.RoomDetail;
 import com.shyn.zyot.wind.mychatapp.Model.User;
 import com.shyn.zyot.wind.mychatapp.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -59,7 +61,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                     // set image
                     if (detail.getMemberIDs().size() == 2) {
                         String receiverID = "";
-                        for (String id : detail.getMemberIDs()){
+                        for (String id : detail.getMemberIDs()) {
                             if (!id.equals(fuser.getUid()))
                                 receiverID = id;
                         }
@@ -100,6 +102,22 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                     // set last msg
                     if (detail.getLastMsgID().equals(""))
                         holder.tvLastMSG.setVisibility(View.GONE);
+                    else {
+                        holder.tvLastMSG.setVisibility(View.VISIBLE);
+                        DatabaseReference messages = FirebaseDatabase.getInstance().getReference("Messages").child(detail.getRoomID()).child(detail.getLastMsgID());
+                        messages.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Message lastMessage = dataSnapshot.getValue(Message.class);
+                                holder.tvLastMSG.setText(lastMessage.getMessage());
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
                 }
 
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -120,7 +138,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
                                         Intent intent = new Intent(mContext, MessageActivity.class);
                                         intent.putExtra("roomID", roomID);
-                                        intent.putExtra("receiverID",receiverID);
+                                        intent.putExtra("receiverID", receiverID);
                                         mContext.startActivity(intent);
                                     }
                                 }
