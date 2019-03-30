@@ -24,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.shyn.zyot.wind.mychatapp.Adapter.MessageAdapter;
 import com.shyn.zyot.wind.mychatapp.Model.Message;
 import com.shyn.zyot.wind.mychatapp.Model.Room;
+import com.shyn.zyot.wind.mychatapp.Model.RoomDetail;
 import com.shyn.zyot.wind.mychatapp.Model.User;
 
 import java.util.ArrayList;
@@ -152,6 +153,17 @@ public class MessageActivity extends AppCompatActivity {
         Room receiverRoom = new Room(roomID);
         userRooms = FirebaseDatabase.getInstance().getReference("UserRooms").child(receiverID);
         userRooms.child(senderID).setValue(receiverRoom);
+
+        // create on room detail
+        DatabaseReference roomDetail = FirebaseDatabase.getInstance().getReference("RoomDetail");
+        RoomDetail detail = new RoomDetail();
+        detail.setRoomID(roomID);
+        detail.setLastMsgID("");
+        ArrayList<String> memberIDs = new ArrayList<>();
+        memberIDs.add(senderID);
+        memberIDs.add(receiverID);
+        detail.setMemberIDs(memberIDs);
+        roomDetail.child(roomID).setValue(detail);
 
         return roomID;
     }

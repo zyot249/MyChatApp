@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.shyn.zyot.wind.mychatapp.Adapter.PagerAdapter;
+import com.shyn.zyot.wind.mychatapp.Fragment.ChatFragment;
 import com.shyn.zyot.wind.mychatapp.Fragment.UserFragment;
 import com.shyn.zyot.wind.mychatapp.Model.User;
 
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         pagerAdapter = new PagerAdapter(getSupportFragmentManager());
+        pagerAdapter.addFragment(new ChatFragment(),"Chats");
         pagerAdapter.addFragment(new UserFragment(), "Users");
 
         viewPager.setAdapter(pagerAdapter);

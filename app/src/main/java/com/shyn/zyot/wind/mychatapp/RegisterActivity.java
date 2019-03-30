@@ -65,7 +65,7 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "Name must be filled", Toast.LENGTH_SHORT).show();
                 else if (email.isEmpty())
                     Toast.makeText(RegisterActivity.this, "Email must be filled", Toast.LENGTH_SHORT).show();
-                else if (password.length() <= 6)
+                else if (password.length() < 6)
                     Toast.makeText(RegisterActivity.this, "Password must be longer than 6 characters", Toast.LENGTH_SHORT).show();
                 else {
                     register(name,email,password);
@@ -90,18 +90,12 @@ public class RegisterActivity extends AppCompatActivity {
                             dbReference = FirebaseDatabase.getInstance().getReference("Users").child(userID);
 
                             HashMap<String, Object> hashMap = new HashMap<>();
-                            HashMap<String, String> chatedUser = new HashMap<>();
                             hashMap.put("id",userID);
                             hashMap.put("username",name);
                             hashMap.put("imageUrl","default");
                             hashMap.put("status", "offline");
                             hashMap.put("search", name.toLowerCase());
 
-
-//                            chatedUser.put("chatUID","asdsadasdas");
-//                            chatedUser.put("UserUID", "ddasdasdasdas");
-//
-//                            hashMap.put("chatedUser",chatedUser);
 
                             dbReference.setValue(hashMap).addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<Void>() {
                                 @Override
