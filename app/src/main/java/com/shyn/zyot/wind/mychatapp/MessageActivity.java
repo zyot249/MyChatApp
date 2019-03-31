@@ -127,6 +127,31 @@ public class MessageActivity extends AppCompatActivity {
 
             }
         });
+
+        seenMessage(roomID,fuser.getUid());
+    }
+
+    private void seenMessage(String roomID, final String userID){
+        DatabaseReference messages = FirebaseDatabase.getInstance().getReference("Messages").child(roomID);
+        messages.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Message message = snapshot.getValue(Message.class);
+                    if (message.getSenderID().equals(userID)){
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("seen", true);
+                        snapshot.getRef().updateChildren(hashMap);
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void setLastMessage(final String roomID) {
@@ -198,11 +223,8 @@ public class MessageActivity extends AppCompatActivity {
 
 
         dbReference = FirebaseDatabase.getInstance().getReference("Messages").child(roomID);
-        HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put("message", message);
-        hashMap.put("senderID", senderID);
-
-        dbReference.push().setValue(hashMap);
+        Message msg = new Message(message,senderID,false);
+        dbReference.push().setValue(msg);
     }
 
     private void readMessage(final String userImageUrl, String roomID) {

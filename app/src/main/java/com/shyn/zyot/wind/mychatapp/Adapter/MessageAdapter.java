@@ -49,11 +49,23 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     @Override
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
         Message message = mMessages.get(position);
+        // set msg
         holder.tvMessage.setText(message.getMessage());
+
+        // set image
         if (senderImageUrl.equals("default"))
             holder.userImage.setImageResource(R.mipmap.ic_launcher_round);
         else
             Glide.with(mContext).load(senderImageUrl).into(holder.userImage);
+
+        // set isSeen
+        if (position == mMessages.size() - 1) {
+            if (message.isSeen()) {
+                holder.tvIsSeen.setText("Seen");
+                holder.tvIsSeen.setVisibility(View.VISIBLE);
+            } else
+                holder.tvIsSeen.setVisibility(View.GONE);
+        } else holder.tvIsSeen.setVisibility(View.GONE);
     }
 
     @Override
@@ -65,11 +77,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         CircleImageView userImage;
         TextView tvMessage;
+        TextView tvIsSeen;
 
         public MessageViewHolder(View itemView) {
             super(itemView);
             userImage = itemView.findViewById(R.id.userImage);
             tvMessage = itemView.findViewById(R.id.tvMessage);
+            tvIsSeen = itemView.findViewById(R.id.tvIsSeen);
         }
 
     }

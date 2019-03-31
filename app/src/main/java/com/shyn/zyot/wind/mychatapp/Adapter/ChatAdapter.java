@@ -71,6 +71,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 User receiver = dataSnapshot.getValue(User.class);
                                 // set image
+                                assert receiver != null;
                                 if (receiver.getImageUrl().equals("default")) {
                                     holder.userImage.setImageResource(R.mipmap.ic_launcher_round);
                                     holder.isSeen.setImageResource(R.mipmap.ic_launcher_round);
@@ -109,7 +110,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 Message lastMessage = dataSnapshot.getValue(Message.class);
-                                holder.tvLastMSG.setText(lastMessage.getMessage());
+                                if (lastMessage != null) {
+                                    holder.tvLastMSG.setText(lastMessage.getMessage());
+                                    if (lastMessage.getSenderID().equals(fuser.getUid())) {
+                                        if (lastMessage.isSeen())
+                                            holder.isSeen.setVisibility(View.VISIBLE);
+                                        else holder.isSeen.setVisibility(View.GONE);
+                                    }
+                                }
                             }
 
                             @Override
