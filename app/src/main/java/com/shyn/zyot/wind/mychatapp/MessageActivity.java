@@ -44,6 +44,8 @@ public class MessageActivity extends AppCompatActivity {
     private DatabaseReference dbReference;
     private FirebaseUser fuser;
 
+    private ValueEventListener seenListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,13 +55,14 @@ public class MessageActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // and this
-//                startActivity(new Intent(MessageActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-//            }
-//        });
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // and this
+                startActivity(new Intent(MessageActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                dbReference.removeEventListener(seenListener);
+            }
+        });
 
         //get current user
         fuser = FirebaseAuth.getInstance().getCurrentUser();
@@ -116,7 +119,7 @@ public class MessageActivity extends AppCompatActivity {
                 if (user.getImageUrl().equals("default")) {
                     receiverImage.setImageResource(R.mipmap.ic_launcher_round);
                 } else
-                    Glide.with(MessageActivity.this).load(user.getImageUrl()).into(receiverImage);
+                    Glide.with(getApplicationContext()).load(user.getImageUrl()).into(receiverImage);
 
                 readMessage(user.getImageUrl(), roomID);
                 setLastMessage(roomID);
@@ -131,14 +134,14 @@ public class MessageActivity extends AppCompatActivity {
         seenMessage(roomID,fuser.getUid());
     }
 
-    private void seenMessage(String roomID, final String userID){
-        DatabaseReference messages = FirebaseDatabase.getInstance().getReference("Messages").child(roomID);
-        messages.addValueEventListener(new ValueEventListener() {
+    private void seenMessage(String roomID, final String senderID){
+        dbReference = FirebaseDatabase.getInstance().getReference("Messages").child(roomID);
+        seenListener = dbReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Message message = snapshot.getValue(Message.class);
-                    if (message.getSenderID().equals(userID)){
+                    if (!message.getSentBy().equals(senderID)){
                         HashMap<String, Object> hashMap = new HashMap<>();
                         hashMap.put("seen", true);
                         snapshot.getRef().updateChildren(hashMap);
@@ -192,21 +195,21 @@ public class MessageActivity extends AppCompatActivity {
 //        chattedUsers.child(senderID).setValue(receiverRoom);
 
         // create room on list
-        DatabaseReference userRooms = FirebaseDatabase.getInstance().getReference();
-        String roomID = userRooms.push().getKey();  // gen key --> roomID
+        dbReference = FirebaseDatabase.getInstance().getReference();
+        String roomID = dbReference.push().getKey();  // gen key --> roomID
 
         // list of sender
         Room senderRoom = new Room(roomID);
-        userRooms = FirebaseDatabase.getInstance().getReference("UserRooms").child(senderID);
-        userRooms.child(receiverID).setValue(senderRoom);
+        dbReference = FirebaseDatabase.getInstance().getReference("UserRooms").child(senderID);
+        dbReference.child(receiverID).setValue(senderRoom);
 
         // list of receiver
         Room receiverRoom = new Room(roomID);
-        userRooms = FirebaseDatabase.getInstance().getReference("UserRooms").child(receiverID);
-        userRooms.child(senderID).setValue(receiverRoom);
+        dbReference = FirebaseDatabase.getInstance().getReference("UserRooms").child(receiverID);
+        dbReference.child(senderID).setValue(receiverRoom);
 
         // create on room detail
-        DatabaseReference roomDetail = FirebaseDatabase.getInstance().getReference("RoomDetail");
+        dbReference = FirebaseDatabase.getInstance().getReference("RoomDetail");
         RoomDetail detail = new RoomDetail();
         detail.setRoomID(roomID);
         detail.setLastMsgID("");
@@ -214,7 +217,7 @@ public class MessageActivity extends AppCompatActivity {
         memberIDs.add(senderID);
         memberIDs.add(receiverID);
         detail.setMemberIDs(memberIDs);
-        roomDetail.child(roomID).setValue(detail);
+        dbReference.child(roomID).setValue(detail);
 
         return roomID;
     }
@@ -269,6 +272,7 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        dbReference.removeEventListener(seenListener);
         status("offline");
     }
 }

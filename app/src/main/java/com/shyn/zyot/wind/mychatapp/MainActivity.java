@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -81,8 +82,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        // open profile activity
+        userImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                startActivity(intent);
+            }
+        });
+
         pagerAdapter = new PagerAdapter(getSupportFragmentManager());
-        pagerAdapter.addFragment(new ChatFragment(),"Chats");
+        pagerAdapter.addFragment(new ChatFragment(), "Chats");
         pagerAdapter.addFragment(new UserFragment(), "Users");
 
         viewPager.setAdapter(pagerAdapter);
@@ -99,8 +110,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.mnLogout:{
+        switch (item.getItemId()) {
+            case R.id.mnLogout: {
                 mAuth.signOut();
                 Intent intent = new Intent(MainActivity.this, StartActivity.class);
                 startActivity(intent);
@@ -111,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void status(String status){
+    private void status(String status) {
         dbReference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
 
         HashMap<String, Object> hashMap = new HashMap<>();

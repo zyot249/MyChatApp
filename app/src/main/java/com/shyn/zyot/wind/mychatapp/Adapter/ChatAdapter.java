@@ -66,7 +66,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                                 receiverID = id;
                         }
                         DatabaseReference users = FirebaseDatabase.getInstance().getReference("Users").child(receiverID);
-                        users.addListenerForSingleValueEvent(new ValueEventListener() {
+                        users.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 User receiver = dataSnapshot.getValue(User.class);
@@ -101,9 +101,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                     }
 
                     // set last msg
-                    if (detail.getLastMsgID().equals(""))
-                        holder.tvLastMSG.setVisibility(View.GONE);
-                    else {
+                    if (detail.getLastMsgID().equals("")) {
+                        holder.tvLastMSG.setVisibility(View.VISIBLE);
+                        holder.tvLastMSG.setText("Please Chat Together...");
+                    } else {
                         holder.tvLastMSG.setVisibility(View.VISIBLE);
                         DatabaseReference messages = FirebaseDatabase.getInstance().getReference("Messages").child(detail.getRoomID()).child(detail.getLastMsgID());
                         messages.addValueEventListener(new ValueEventListener() {
@@ -111,8 +112,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 Message lastMessage = dataSnapshot.getValue(Message.class);
                                 if (lastMessage != null) {
-                                    holder.tvLastMSG.setText(lastMessage.getMessage());
-                                    if (lastMessage.getSenderID().equals(fuser.getUid())) {
+                                    holder.tvLastMSG.setText(lastMessage.getContent());
+                                    if (lastMessage.getSentBy().equals(fuser.getUid())) {
                                         if (lastMessage.isSeen())
                                             holder.isSeen.setVisibility(View.VISIBLE);
                                         else holder.isSeen.setVisibility(View.GONE);

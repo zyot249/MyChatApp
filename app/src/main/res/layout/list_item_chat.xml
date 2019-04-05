@@ -29,6 +29,7 @@
         android:layout_marginLeft="18dp"
         android:layout_marginTop="5dp"
         android:layout_toRightOf="@+id/userImage"
+        android:maxLines="1"
         android:text="last message"
         android:textSize="16dp" />
 

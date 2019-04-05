@@ -50,7 +50,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
         Message message = mMessages.get(position);
         // set msg
-        holder.tvMessage.setText(message.getMessage());
+        holder.tvMessage.setText(message.getContent());
 
         // set image
         if (senderImageUrl.equals("default"))
@@ -91,7 +91,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     @Override
     public int getItemViewType(int position) {
         fuser = FirebaseAuth.getInstance().getCurrentUser();
-        if (mMessages.get(position).getSenderID().equals(fuser.getUid()))
+        if (mMessages.get(position).getSentBy().equals(fuser.getUid()))
             return MSG_TYPE_RIGHT;
         else return MSG_TYPE_LEFT;
     }
