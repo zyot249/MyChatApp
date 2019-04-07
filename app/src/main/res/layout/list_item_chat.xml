@@ -17,7 +17,6 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="18dp"
         android:layout_toRightOf="@+id/userImage"
-        android:text="Shynnnnnnn"
         android:textSize="24dp"
         android:textStyle="bold" />
 
@@ -30,7 +29,6 @@
         android:layout_marginTop="5dp"
         android:layout_toRightOf="@+id/userImage"
         android:maxLines="1"
-        android:text="last message"
         android:textSize="16dp" />
 
     <de.hdodenhof.circleimageview.CircleImageView

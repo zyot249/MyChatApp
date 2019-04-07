@@ -17,8 +17,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.shyn.zyot.wind.mychatapp.Adapter.ChatAdapter;
 import com.shyn.zyot.wind.mychatapp.Model.Room;
+import com.shyn.zyot.wind.mychatapp.Notification.Token;
 import com.shyn.zyot.wind.mychatapp.R;
 
 import java.util.ArrayList;
@@ -40,6 +42,7 @@ public class ChatFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         roomChats = new ArrayList<>();
         readChats();
+        updateToken(FirebaseInstanceId.getInstance().getToken());
         return view;
     }
 
@@ -55,7 +58,7 @@ public class ChatFragment extends Fragment {
                     roomChats.add(room);
                 }
 
-                ChatAdapter chatAdapter = new ChatAdapter(getContext(),roomChats);
+                chatAdapter = new ChatAdapter(getContext(),roomChats);
                 recyclerView.setAdapter(chatAdapter);
             }
 
@@ -64,5 +67,12 @@ public class ChatFragment extends Fragment {
 
             }
         });
+    }
+
+    private void updateToken(String token){
+        FirebaseUser fuser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("UserTokens");
+        Token token1 = new Token(token);
+        reference.child(fuser.getUid()).setValue(token1);
     }
 }

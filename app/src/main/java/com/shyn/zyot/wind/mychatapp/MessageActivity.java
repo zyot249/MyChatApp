@@ -1,6 +1,7 @@
 package com.shyn.zyot.wind.mychatapp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,18 +21,28 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.shyn.zyot.wind.mychatapp.Adapter.MessageAdapter;
 import com.shyn.zyot.wind.mychatapp.Model.Message;
 import com.shyn.zyot.wind.mychatapp.Model.Room;
 import com.shyn.zyot.wind.mychatapp.Model.RoomDetail;
 import com.shyn.zyot.wind.mychatapp.Model.User;
+import com.shyn.zyot.wind.mychatapp.Notification.Client;
+import com.shyn.zyot.wind.mychatapp.Notification.Data;
+import com.shyn.zyot.wind.mychatapp.Notification.MyResponse;
+import com.shyn.zyot.wind.mychatapp.Notification.Sender;
+import com.shyn.zyot.wind.mychatapp.Notification.ServiceAPI;
+import com.shyn.zyot.wind.mychatapp.Notification.Token;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -45,6 +56,9 @@ public class MessageActivity extends AppCompatActivity {
     private FirebaseUser fuser;
 
     private ValueEventListener seenListener;
+
+    ServiceAPI serviceAPI;
+    boolean notify = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +78,9 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
+        // init api service for notification
+        serviceAPI = Client.getClient("https://fcm.googleapis.com/").create(ServiceAPI.class);
+
         //get current user
         fuser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -82,8 +99,10 @@ public class MessageActivity extends AppCompatActivity {
 
         // get receiver and room
         Intent intent = getIntent();
-        String receiverID = intent.getStringExtra("receiverID");
+        final String receiverID = intent.getStringExtra("receiverID");
         String getRoomID = intent.getStringExtra("roomID");
+
+
 
 
         // create room if not exist
@@ -98,12 +117,13 @@ public class MessageActivity extends AppCompatActivity {
         btnSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                notify = true;
                 // validate input
                 String input = etMessage.getText().toString();
                 if (input.length() == 0)
                     Toast.makeText(MessageActivity.this, "Empty Message!", Toast.LENGTH_SHORT).show();
                 else {
-                    sendMessage(input, senderID, roomID);
+                    sendMessage(input, senderID, roomID, receiverID);
                     etMessage.setText("");
                 }
             }
@@ -131,17 +151,17 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
-        seenMessage(roomID,fuser.getUid());
+        seenMessage(roomID, fuser.getUid());
     }
 
-    private void seenMessage(String roomID, final String senderID){
+    private void seenMessage(String roomID, final String senderID) {
         dbReference = FirebaseDatabase.getInstance().getReference("Messages").child(roomID);
         seenListener = dbReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Message message = snapshot.getValue(Message.class);
-                    if (!message.getSentBy().equals(senderID)){
+                    if (!message.getSentBy().equals(senderID)) {
                         HashMap<String, Object> hashMap = new HashMap<>();
                         hashMap.put("seen", true);
                         snapshot.getRef().updateChildren(hashMap);
@@ -164,14 +184,14 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String lastMessageID = "";
                 // get the latest msg
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     lastMessageID = snapshot.getKey();
                 }
 
                 // update last msg of room
                 DatabaseReference roomDetail = FirebaseDatabase.getInstance().getReference("RoomDetail").child(roomID);
                 HashMap<String, Object> hashMap = new HashMap<>();
-                hashMap.put("lastMsgID",lastMessageID);
+                hashMap.put("lastMsgID", lastMessageID);
                 roomDetail.updateChildren(hashMap);
             }
 
@@ -222,12 +242,27 @@ public class MessageActivity extends AppCompatActivity {
         return roomID;
     }
 
-    private void sendMessage(String message, String senderID, String roomID) {
-
-
+    private void sendMessage(final String message, String senderID, String roomID, final String receiverID) {
         dbReference = FirebaseDatabase.getInstance().getReference("Messages").child(roomID);
-        Message msg = new Message(message,senderID,false);
+        Message msg = new Message(message, senderID, false);
         dbReference.push().setValue(msg);
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                if (notify) {
+                    sendNotification(receiverID, user.getUsername(), message);
+                }
+                notify = false;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void readMessage(final String userImageUrl, String roomID) {
@@ -263,10 +298,56 @@ public class MessageActivity extends AppCompatActivity {
         dbReference.updateChildren(hashMap);
     }
 
+    private void sendNotification(final String receiver, final String username, final String message){
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("UserTokens");
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Token token = snapshot.getValue(Token.class);
+                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+": "+message, "New Message",
+                            receiver);
+
+                    Sender sender = new Sender(data, token.getToken());
+
+                    serviceAPI.sendNotification(sender)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if (response.code() == 200){
+                                        if (response.body().success != 1){
+                                            Toast.makeText(MessageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void currentUser(String userid) {
+        SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
+        editor.putString("currentuser", userid);
+        editor.apply();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         status("online");
+        currentUser(fuser.getUid());
     }
 
     @Override
@@ -274,5 +355,6 @@ public class MessageActivity extends AppCompatActivity {
         super.onPause();
         dbReference.removeEventListener(seenListener);
         status("offline");
+        currentUser("none");
     }
 }

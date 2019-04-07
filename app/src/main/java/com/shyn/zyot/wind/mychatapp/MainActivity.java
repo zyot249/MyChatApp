@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
-
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +24,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.shyn.zyot.wind.mychatapp.Adapter.PagerAdapter;
 import com.shyn.zyot.wind.mychatapp.Fragment.ChatFragment;
 import com.shyn.zyot.wind.mychatapp.Fragment.UserFragment;
+import com.shyn.zyot.wind.mychatapp.Model.Message;
+import com.shyn.zyot.wind.mychatapp.Model.Room;
 import com.shyn.zyot.wind.mychatapp.Model.User;
 
 import java.util.HashMap;
@@ -42,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private PagerAdapter pagerAdapter;
+
+    protected int unread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,12 +95,60 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        pagerAdapter = new PagerAdapter(getSupportFragmentManager());
-        pagerAdapter.addFragment(new ChatFragment(), "Chats");
-        pagerAdapter.addFragment(new UserFragment(), "Users");
+        // unread messages
+        dbReference = FirebaseDatabase.getInstance().getReference("Messages");
+        dbReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                dbReference = FirebaseDatabase.getInstance().getReference("UserRooms").child(firebaseUser.getUid());
+                dbReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        pagerAdapter = new PagerAdapter(getSupportFragmentManager());
+                        unread = 0;
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            Room room = snapshot.getValue(Room.class);
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Messages").child(room.getRoomID());
+                            reference.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot snapshot1 : dataSnapshot.getChildren()) {
+                                        Message message = snapshot1.getValue(Message.class);
+                                        if (!message.getSentBy().equals(firebaseUser.getUid()))
+                                            if (!message.isSeen())
+                                                unread++;
+                                    }
+                                }
 
-        viewPager.setAdapter(pagerAdapter);
-        tabLayout.setupWithViewPager(viewPager);
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                        if (unread == 0) {
+                            pagerAdapter.addFragment(new ChatFragment(), "Chats");
+                        } else
+                            pagerAdapter.addFragment(new ChatFragment(), "(" + unread + ")" + "Chats");
+                        pagerAdapter.addFragment(new UserFragment(), "Users");
+
+                        viewPager.setAdapter(pagerAdapter);
+                        tabLayout.setupWithViewPager(viewPager);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
     }
 
