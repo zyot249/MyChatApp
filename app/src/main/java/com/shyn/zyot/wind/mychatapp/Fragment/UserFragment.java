@@ -70,7 +70,8 @@ public class UserFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.toString().isEmpty()) {
                     readUsersOnce();
-                    querySearch.removeEventListener(searchEventListener);
+                    if (searchEventListener != null)
+                        querySearch.removeEventListener(searchEventListener);
                 } else
                     searchUsers(s.toString().toLowerCase());
             }
