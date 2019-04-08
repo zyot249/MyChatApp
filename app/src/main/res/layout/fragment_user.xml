@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:paddingTop="4dp">
 
     <EditText
         android:id="@+id/etSearch"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:cursorVisible="false"
+        android:layout_height="32dp"
+        android:background="@drawable/search_box"
         android:drawableLeft="@drawable/ic_search_black_24dp"
+        android:focusedByDefault="false"
         android:hint="Search"
         android:inputType="text"
         android:paddingLeft="10dp"
@@ -19,5 +23,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/etSearch"
-        android:layout_marginTop="6dp" />
+        android:layout_marginTop="2dp" />
 </RelativeLayout>

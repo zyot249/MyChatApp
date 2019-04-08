@@ -22,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.shyn.zyot.wind.mychatapp.Adapter.UserAdapter;
+import com.shyn.zyot.wind.mychatapp.Divider.SampleDivider;
 import com.shyn.zyot.wind.mychatapp.Model.User;
 import com.shyn.zyot.wind.mychatapp.R;
 
@@ -33,6 +34,8 @@ public class UserFragment extends Fragment {
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
     private List<User> users;
+    private ValueEventListener searchEventListener;
+    private Query querySearch;
 
     public UserFragment() {
 
@@ -45,8 +48,13 @@ public class UserFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_user, container, false);
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(linearLayoutManager);
+//        UserListDivider divider = new UserListDivider(recyclerView.getContext(), linearLayoutManager.getOrientation());
+        SampleDivider divider = new SampleDivider(recyclerView.getContext(), R.drawable.divider_recyclerview);
 
+//        divider.setDrawable(getContext().getResources().getDrawable(R.drawable.divider_recyclerview));
+        recyclerView.addItemDecoration(divider);
         users = new ArrayList<>();
         readUsers();
 
@@ -60,15 +68,42 @@ public class UserFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                searchUsers(s.toString().toLowerCase());
+                if (s.toString().isEmpty()) {
+                    readUsersOnce();
+                    querySearch.removeEventListener(searchEventListener);
+                } else
+                    searchUsers(s.toString().toLowerCase());
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
             }
         });
         return view;
+    }
+
+    private void readUsersOnce() {
+        final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference("Users");
+        dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                users.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    User user = snapshot.getValue(User.class);
+                    if (!user.getId().equals(firebaseUser.getUid()))
+                        users.add(user);
+                }
+
+                userAdapter = new UserAdapter(getContext(), users);
+                recyclerView.setAdapter(userAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void readUsers() {
@@ -97,11 +132,11 @@ public class UserFragment extends Fragment {
 
     private void searchUsers(String keyword) {
         final FirebaseUser fuser = FirebaseAuth.getInstance().getCurrentUser();
-        Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("search")
+        querySearch = FirebaseDatabase.getInstance().getReference("Users").orderByChild("search")
                 .startAt(keyword)
                 .endAt(keyword + "\uf8ff");
 
-        query.addValueEventListener(new ValueEventListener() {
+        searchEventListener = querySearch.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 users.clear();

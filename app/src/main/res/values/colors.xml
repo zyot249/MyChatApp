@@ -2,5 +2,10 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#01fff2</color>
+
+    <color name="colorSeenMessage">#797979</color>
+    <color name="colorUnseenMessage">#000000</color>
+
+    <color name="colorBackgroundProfile">#e5bebebe</color>
 </resources>

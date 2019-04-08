@@ -17,7 +17,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.shyn.zyot.wind.mychatapp.Adapter.ChatAdapter;
 import com.shyn.zyot.wind.mychatapp.Model.Room;
 import com.shyn.zyot.wind.mychatapp.Notification.Token;
@@ -42,7 +41,7 @@ public class ChatFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         roomChats = new ArrayList<>();
         readChats();
-        updateToken(FirebaseInstanceId.getInstance().getToken());
+//        updateToken(FirebaseInstanceId.getInstance().getToken());
         return view;
     }
 

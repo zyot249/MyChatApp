@@ -17,19 +17,19 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="18dp"
         android:layout_toRightOf="@+id/userImage"
-        android:textSize="24dp"
-        android:textStyle="bold" />
+        android:textColor="#000000"
+        android:textSize="26dp" />
 
     <TextView
         android:id="@+id/tvLastMSG"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvUsername"
-        android:layout_marginLeft="18dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginLeft="20dp"
         android:layout_toRightOf="@+id/userImage"
         android:maxLines="1"
-        android:textSize="16dp" />
+        android:textColor="@color/colorUnseenMessage"
+        android:textSize="20dp" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/statusOn"

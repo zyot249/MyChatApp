@@ -24,10 +24,12 @@ import com.shyn.zyot.wind.mychatapp.Model.RoomDetail;
 import com.shyn.zyot.wind.mychatapp.Model.User;
 import com.shyn.zyot.wind.mychatapp.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static android.graphics.Typeface.BOLD;
+import static android.graphics.Typeface.NORMAL;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> {
     private Context mContext;
@@ -114,9 +116,21 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                                 if (lastMessage != null) {
                                     holder.tvLastMSG.setText(lastMessage.getContent());
                                     if (lastMessage.getSentBy().equals(fuser.getUid())) {
-                                        if (lastMessage.isSeen())
+                                        holder.tvLastMSG.setTextColor(mContext.getResources().getColor(R.color.colorSeenMessage));
+                                        if (lastMessage.isSeen()) {
                                             holder.isSeen.setVisibility(View.VISIBLE);
-                                        else holder.isSeen.setVisibility(View.GONE);
+                                        } else {
+                                            holder.isSeen.setVisibility(View.GONE);
+                                        }
+                                    } else {
+                                        holder.isSeen.setVisibility(View.GONE);
+                                        if (lastMessage.isSeen()) {
+                                            holder.tvUsername.setTypeface(holder.tvUsername.getTypeface(), NORMAL);
+                                            holder.tvLastMSG.setTextColor(mContext.getResources().getColor(R.color.colorSeenMessage));
+                                        } else {
+                                            holder.tvUsername.setTypeface(holder.tvUsername.getTypeface(), BOLD);
+                                            holder.tvLastMSG.setTextColor(mContext.getResources().getColor(R.color.colorUnseenMessage));
+                                        }
                                     }
                                 }
                             }

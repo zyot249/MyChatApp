@@ -2,9 +2,9 @@ package com.shyn.zyot.wind.mychatapp;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -28,7 +28,6 @@ import com.shyn.zyot.wind.mychatapp.Model.Message;
 import com.shyn.zyot.wind.mychatapp.Model.Room;
 import com.shyn.zyot.wind.mychatapp.Model.RoomDetail;
 import com.shyn.zyot.wind.mychatapp.Model.User;
-import com.shyn.zyot.wind.mychatapp.Notification.Client;
 import com.shyn.zyot.wind.mychatapp.Notification.Data;
 import com.shyn.zyot.wind.mychatapp.Notification.MyResponse;
 import com.shyn.zyot.wind.mychatapp.Notification.Sender;
@@ -51,6 +50,7 @@ public class MessageActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private EditText etMessage;
     private ImageButton btnSendMessage;
+    private TextView tvReceiverStatus;
 
     private DatabaseReference dbReference;
     private FirebaseUser fuser;
@@ -79,7 +79,7 @@ public class MessageActivity extends AppCompatActivity {
         });
 
         // init api service for notification
-        serviceAPI = Client.getClient("https://fcm.googleapis.com/").create(ServiceAPI.class);
+//        serviceAPI = Client.getClient("https://fcm.googleapis.com/").create(ServiceAPI.class);
 
         //get current user
         fuser = FirebaseAuth.getInstance().getCurrentUser();
@@ -90,6 +90,7 @@ public class MessageActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         etMessage = findViewById(R.id.etMessage);
         btnSendMessage = findViewById(R.id.btnSendMessage);
+        tvReceiverStatus = findViewById(R.id.tvReceiverStatus);
 
         // set layout manager for recyclerView
         recyclerView.setHasFixedSize(true);
@@ -101,8 +102,6 @@ public class MessageActivity extends AppCompatActivity {
         Intent intent = getIntent();
         final String receiverID = intent.getStringExtra("receiverID");
         String getRoomID = intent.getStringExtra("roomID");
-
-
 
 
         // create room if not exist
@@ -117,7 +116,7 @@ public class MessageActivity extends AppCompatActivity {
         btnSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                notify = true;
+//                notify = true;
                 // validate input
                 String input = etMessage.getText().toString();
                 if (input.length() == 0)
@@ -130,12 +129,18 @@ public class MessageActivity extends AppCompatActivity {
         });
 
 
+        // show info of receiver
         dbReference = FirebaseDatabase.getInstance().getReference("Users").child(receiverID);
         dbReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
                 tvReceiverName.setText(user.getUsername());
+                if (!user.getStatus().isEmpty()) {
+                    tvReceiverStatus.setVisibility(View.VISIBLE);
+                    tvReceiverStatus.setText(user.getStatus());
+                } else
+                    tvReceiverStatus.setVisibility(View.GONE);
                 if (user.getImageUrl().equals("default")) {
                     receiverImage.setImageResource(R.mipmap.ic_launcher_round);
                 } else
@@ -166,7 +171,6 @@ public class MessageActivity extends AppCompatActivity {
                         hashMap.put("seen", true);
                         snapshot.getRef().updateChildren(hashMap);
                     }
-
                 }
             }
 
@@ -247,22 +251,22 @@ public class MessageActivity extends AppCompatActivity {
         Message msg = new Message(message, senderID, false);
         dbReference.push().setValue(msg);
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid());
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                if (notify) {
-                    sendNotification(receiverID, user.getUsername(), message);
-                }
-                notify = false;
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid());
+//        reference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                User user = dataSnapshot.getValue(User.class);
+//                if (notify) {
+//                    sendNotification(receiverID, user.getUsername(), message);
+//                }
+//                notify = false;
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
     }
 
     private void readMessage(final String userImageUrl, String roomID) {
@@ -298,15 +302,15 @@ public class MessageActivity extends AppCompatActivity {
         dbReference.updateChildren(hashMap);
     }
 
-    private void sendNotification(final String receiver, final String username, final String message){
+    private void sendNotification(final String receiver, final String username, final String message) {
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("UserTokens");
         Query query = tokens.orderByKey().equalTo(receiver);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+": "+message, "New Message",
+                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username + ": " + message, "New Message",
                             receiver);
 
                     Sender sender = new Sender(data, token.getToken());
@@ -315,8 +319,8 @@ public class MessageActivity extends AppCompatActivity {
                             .enqueue(new Callback<MyResponse>() {
                                 @Override
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
-                                    if (response.code() == 200){
-                                        if (response.body().success != 1){
+                                    if (response.code() == 200) {
+                                        if (response.body().success != 1) {
                                             Toast.makeText(MessageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
                                         }
                                     }
