@@ -1,7 +1,6 @@
 package com.shyn.zyot.wind.mychatapp;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -21,27 +20,18 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.shyn.zyot.wind.mychatapp.Adapter.MessageAdapter;
 import com.shyn.zyot.wind.mychatapp.Model.Message;
 import com.shyn.zyot.wind.mychatapp.Model.Room;
 import com.shyn.zyot.wind.mychatapp.Model.RoomDetail;
 import com.shyn.zyot.wind.mychatapp.Model.User;
-import com.shyn.zyot.wind.mychatapp.Notification.Data;
-import com.shyn.zyot.wind.mychatapp.Notification.MyResponse;
-import com.shyn.zyot.wind.mychatapp.Notification.Sender;
-import com.shyn.zyot.wind.mychatapp.Notification.ServiceAPI;
-import com.shyn.zyot.wind.mychatapp.Notification.Token;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -57,7 +47,7 @@ public class MessageActivity extends AppCompatActivity {
 
     private ValueEventListener seenListener;
 
-    ServiceAPI serviceAPI;
+//    ServiceAPI serviceAPI;
     boolean notify = false;
 
     @Override
@@ -302,56 +292,56 @@ public class MessageActivity extends AppCompatActivity {
         dbReference.updateChildren(hashMap);
     }
 
-    private void sendNotification(final String receiver, final String username, final String message) {
-        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("UserTokens");
-        Query query = tokens.orderByKey().equalTo(receiver);
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username + ": " + message, "New Message",
-                            receiver);
+//    private void sendNotification(final String receiver, final String username, final String message) {
+//        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("UserTokens");
+//        Query query = tokens.orderByKey().equalTo(receiver);
+//        query.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                    Token token = snapshot.getValue(Token.class);
+//                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username + ": " + message, "New Message",
+//                            receiver);
+//
+//                    Sender sender = new Sender(data, token.getToken());
+//
+//                    serviceAPI.sendNotification(sender)
+//                            .enqueue(new Callback<MyResponse>() {
+//                                @Override
+//                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+//                                    if (response.code() == 200) {
+//                                        if (response.body().success != 1) {
+//                                            Toast.makeText(MessageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+//                                        }
+//                                    }
+//                                }
+//
+//                                @Override
+//                                public void onFailure(Call<MyResponse> call, Throwable t) {
+//
+//                                }
+//                            });
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+//    }
 
-                    Sender sender = new Sender(data, token.getToken());
-
-                    serviceAPI.sendNotification(sender)
-                            .enqueue(new Callback<MyResponse>() {
-                                @Override
-                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
-                                    if (response.code() == 200) {
-                                        if (response.body().success != 1) {
-                                            Toast.makeText(MessageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<MyResponse> call, Throwable t) {
-
-                                }
-                            });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void currentUser(String userid) {
-        SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
-        editor.putString("currentuser", userid);
-        editor.apply();
-    }
+//    private void currentUser(String userid) {
+//        SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
+//        editor.putString("currentuser", userid);
+//        editor.apply();
+//    }
 
     @Override
     protected void onResume() {
         super.onResume();
         status("online");
-        currentUser(fuser.getUid());
+//        currentUser(fuser.getUid());
     }
 
     @Override
@@ -359,6 +349,6 @@ public class MessageActivity extends AppCompatActivity {
         super.onPause();
         dbReference.removeEventListener(seenListener);
         status("offline");
-        currentUser("none");
+//        currentUser("none");
     }
 }

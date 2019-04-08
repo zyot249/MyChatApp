@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
@@ -41,15 +40,15 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (firebaseUser != null && sender.equals(firebaseUser.getUid())){
-//            if (!currentUser.equals(receiver)) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    sendOreoNotification(remoteMessage);
-                } else {
-                    sendNotification(remoteMessage);
-                }
-//            }
-        }
+//        if (firebaseUser != null && sender.equals(firebaseUser.getUid())){
+////            if (!currentUser.equals(receiver)) {
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                    sendOreoNotification(remoteMessage);
+//                } else {
+//                    sendNotification(remoteMessage);
+//                }
+////            }
+//        }
     }
 
     private void getRoomID(String userID){
