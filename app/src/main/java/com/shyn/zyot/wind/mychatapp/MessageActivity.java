@@ -47,7 +47,7 @@ public class MessageActivity extends AppCompatActivity {
 
     private ValueEventListener seenListener;
 
-//    ServiceAPI serviceAPI;
+    //    ServiceAPI serviceAPI;
     boolean notify = false;
 
     @Override
@@ -347,7 +347,8 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        dbReference.removeEventListener(seenListener);
+        if (seenListener != null)
+            dbReference.removeEventListener(seenListener);
         status("offline");
 //        currentUser("none");
     }
