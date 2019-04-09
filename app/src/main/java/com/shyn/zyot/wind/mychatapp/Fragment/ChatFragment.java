@@ -45,19 +45,20 @@ public class ChatFragment extends Fragment {
         return view;
     }
 
-    private void readChats(){
+    private void readChats() {
         FirebaseUser fuser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference userRooms = FirebaseDatabase.getInstance().getReference("UserRooms").child(fuser.getUid());
         userRooms.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 roomChats.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Room room = snapshot.getValue(Room.class);
-                    roomChats.add(room);
+                    if (room != null)
+                        roomChats.add(room);
                 }
 
-                chatAdapter = new ChatAdapter(getContext(),roomChats);
+                chatAdapter = new ChatAdapter(getContext(), roomChats);
                 recyclerView.setAdapter(chatAdapter);
             }
 
@@ -68,7 +69,7 @@ public class ChatFragment extends Fragment {
         });
     }
 
-    private void updateToken(String token){
+    private void updateToken(String token) {
         FirebaseUser fuser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("UserTokens");
         Token token1 = new Token(token);

@@ -53,6 +53,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     public void onBindViewHolder(@NonNull final ChatViewHolder holder, int position) {
         final FirebaseUser fuser = FirebaseAuth.getInstance().getCurrentUser();
         Room room = roomChats.get(position);
+        final int index = position;
         final String roomID = room.getRoomID();
         final DatabaseReference roomDetail = FirebaseDatabase.getInstance().getReference("RoomDetail").child(roomID);
         roomDetail.addValueEventListener(new ValueEventListener() {
@@ -141,6 +142,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                             }
                         });
                     }
+                } else {
+                    roomChats.remove(index);
                 }
 
                 holder.itemView.setOnClickListener(new View.OnClickListener() {

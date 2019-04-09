@@ -1,9 +1,9 @@
 package com.shyn.zyot.wind.mychatapp;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
@@ -47,12 +47,11 @@ public class LoginActivity extends AppCompatActivity {
         // get data if after register
         Intent intent = getIntent();
         String action = intent.getAction();
-        if (action.equals("LOGIN_AFTER_REGISTER")) {
+        if (action.equals("LOGIN_AFTER_REGISTER") || action.equals("LOGIN_AFTER_RESET_PASSWORD")) {
             String email = intent.getStringExtra("user_email");
             if (!email.isEmpty())
                 edtEmail.setText(email);
         }
-
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,6 +79,14 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                             });
                 }
+            }
+        });
+
+        // reset password if forgot
+        tvForgotPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
             }
         });
     }

@@ -90,6 +90,8 @@
             android:layout_gravity="end"
             android:layout_marginTop="6dp"
             android:text="Forgot your password?"
-            android:textColor="#f2352e" />
+            android:textColor="#ff3931"
+            android:textSize="18dp"
+            android:textStyle="bold|italic" />
     </LinearLayout>
 </RelativeLayout>

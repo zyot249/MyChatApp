@@ -1,9 +1,9 @@
 package com.shyn.zyot.wind.mychatapp;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
@@ -17,11 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.shyn.zyot.wind.mychatapp.Model.User;
 
 
 public class RegisterActivity extends AppCompatActivity {
@@ -68,39 +64,32 @@ public class RegisterActivity extends AppCompatActivity {
                 else if (password.length() < 6)
                     Toast.makeText(RegisterActivity.this, "Password must be longer than 6 characters", Toast.LENGTH_SHORT).show();
                 else {
-                    register(name,email,password);
+                    register(name, email, password);
                 }
             }
         });
     }
 
-    private void register(final String name, String email, String password){
+    private void register(final String name, String email, String password) {
         final String userEmail = email;
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                            final FirebaseUser firebaseUser = mAuth.getCurrentUser();
                             assert firebaseUser != null;
                             String userID = firebaseUser.getUid();
 
                             Toast.makeText(RegisterActivity.this, "Register Successfully", Toast.LENGTH_SHORT).show();
                             // Write database
                             dbReference = FirebaseDatabase.getInstance().getReference("Users").child(userID);
+                            User user = new User(userID, name, "default", "offline", name.toLowerCase());
 
-                            HashMap<String, Object> hashMap = new HashMap<>();
-                            hashMap.put("id",userID);
-                            hashMap.put("username",name);
-                            hashMap.put("imageUrl","default");
-                            hashMap.put("status", "offline");
-                            hashMap.put("search", name.toLowerCase());
-
-
-                            dbReference.setValue(hashMap).addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<Void>() {
+                            dbReference.setValue(user).addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()){
+                                    if (task.isSuccessful()) {
                                         // open Login Activity
                                         mAuth.signOut();
                                         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
@@ -108,15 +97,17 @@ public class RegisterActivity extends AppCompatActivity {
                                         intent.putExtra("user_email", userEmail);
                                         startActivity(intent);
                                         finish();
-                                    }else
+                                    } else {
                                         Toast.makeText(RegisterActivity.this, "You can't register with this email and password!", Toast.LENGTH_SHORT).show();
+                                        mAuth.signOut();
+                                        firebaseUser.delete();
+                                    }
                                 }
                             });
                         } else
                             Toast.makeText(RegisterActivity.this, "Register Failed", Toast.LENGTH_SHORT).show();
                     }
                 });
-
 
 
     }
