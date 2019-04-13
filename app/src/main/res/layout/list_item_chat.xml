@@ -27,6 +27,7 @@
         android:layout_below="@+id/tvUsername"
         android:layout_marginLeft="20dp"
         android:layout_toRightOf="@+id/userImage"
+        android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/colorUnseenMessage"
         android:textSize="20dp" />
