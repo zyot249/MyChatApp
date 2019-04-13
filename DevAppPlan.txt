@@ -1,0 +1,28 @@
+Dev app chat plan (update 13/04/2019)
+
++) verify email
+	- send verify email when register
+	- if the email is not verified --> cannot login ( check when login )
+	- when login, if the email is not verified -->  show dialog (send verify email again) for user
+
++) edit theme for app
++) bugs
+	- unread messages
+	    ./ 1 solution: create a new reference containing # unread msgs in each room (save by userid and roomid) *maybe easier*
+	- notification
++) app more function on profile
+    - reset password (required enter current password)
+    - move "log out" function from main activity --> profile activity
+    - "change name" function
++) In main activity
+    - add "make chatting" function
+        ./ choose friends --> chat
+        ./ if choose 1 person --> check if exist the room chat  --> move to that room
+        ./ if choose >= 2 people --> create room chat for multi-person(optional)
+    - in User fragment --> Friend fragment
+        ./ only show friends
+        ./ add "add friend" function (support search in all users)
+        ./ change search --> search friends
++) In message activity
+    - add send image
+    - open camera to take a picture --> send this image (optional)
