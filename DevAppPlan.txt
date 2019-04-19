@@ -26,3 +26,5 @@ Dev app chat plan (update 13/04/2019)
 +) In message activity
     - add send image
     - open camera to take a picture --> send this image (optional)
++) Add time to msg, active last time to chat room
+   sort by time
