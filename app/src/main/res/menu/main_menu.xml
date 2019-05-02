@@ -2,7 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/mnLogout"
-        android:title="Logout"
-        app:showAsAction="never" />
+        android:id="@+id/itemAddFriend"
+        android:icon="@drawable/ic_person_add_white_24dp"
+        android:title="Add new friend"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/itemChat"
+        android:icon="@drawable/ic_edit_white_24dp"
+        android:title="New message"
+
+        app:showAsAction="always" />
 </menu>

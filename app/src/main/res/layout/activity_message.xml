@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#e6e6e6"
+    android:background="#fff"
     tools:context=".MessageActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -16,7 +16,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/colorBlueButtonOnPress"
             android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/MenuStyle">
 
@@ -68,28 +68,38 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/sendMessageLayout"
-        android:layout_below="@id/appBarLayout" />
+        android:layout_below="@id/appBarLayout"
+        android:layout_marginBottom="16dp"/>
 
-    <RelativeLayout
+    <LinearLayout
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
         android:id="@+id/sendMessageLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:background="#fff">
+        android:background="#fff"
+        android:orientation="horizontal"
+        android:weightSum="10">
 
         <EditText
             android:id="@+id/etMessage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter your message" />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="9"
+            android:background="@drawable/rectangle_button"
+            android:backgroundTint="#e6e6e6"
+            android:hint="Enter your message"
+            android:padding="10dp" />
 
         <ImageButton
+            android:background="@drawable/rectangle_button"
             android:id="@+id/btnSendMessage"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_alignParentRight="true"
-            android:src="@mipmap/ic_send" />
-    </RelativeLayout>
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@mipmap/send_email" />
+    </LinearLayout>
 
 
 </RelativeLayout>

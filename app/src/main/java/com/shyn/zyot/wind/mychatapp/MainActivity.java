@@ -2,11 +2,15 @@ package com.shyn.zyot.wind.mychatapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
+
 import com.google.android.material.tabs.TabLayout;
+
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -106,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                     pagerAdapter.addFragment(new ChatFragment(), "Chats");
                 else
                     pagerAdapter.addFragment(new ChatFragment(), "(" + cnt + ")" + "Chats");
-                pagerAdapter.addFragment(new UserFragment(),"Users");
+                pagerAdapter.addFragment(new UserFragment(), "Users");
                 viewPager.setAdapter(pagerAdapter);
                 tabLayout.setupWithViewPager(viewPager);
 
@@ -117,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
 
 
     }
@@ -134,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                     messages.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot snapshot1 : dataSnapshot.getChildren()){
+                            for (DataSnapshot snapshot1 : dataSnapshot.getChildren()) {
                                 Message message = snapshot1.getValue(Message.class);
                                 if (!message.getSentBy().equals(firebaseUser.getUid()) && !message.isSeen())
                                     unread++;
@@ -168,11 +171,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.mnLogout: {
-                mAuth.signOut();
-                Intent intent = new Intent(MainActivity.this, StartActivity.class);
-                startActivity(intent);
-                finish();
+            case R.id.itemAddFriend: {
+                break;
+            }
+            case R.id.itemChat: {
                 break;
             }
         }

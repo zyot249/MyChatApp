@@ -1,11 +1,14 @@
 package com.shyn.zyot.wind.mychatapp;
 
 import android.app.ProgressDialog;
+import android.app.TaskStackBuilder;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.MimeTypeMap;
@@ -39,11 +42,13 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private static final int REQUEST_CODE_OPEN_IMAGE = 1001;
 
     private Button btnDone;
+    private Button btnLogout;
     private CircleImageView userImage;
     private TextView tvUsername;
 
     private Uri imageUri;
 
+    private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
     private DatabaseReference dbReference;
     private StorageReference stReference;
@@ -57,10 +62,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         btnDone = findViewById(R.id.btnDone);
         userImage = findViewById(R.id.userImage);
         tvUsername = findViewById(R.id.tvUsername);
+        btnLogout = findViewById(R.id.btnLogout);
 
         stReference = FirebaseStorage.getInstance().getReference("ProfileImages");
         // get user ID from main
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        mAuth = FirebaseAuth.getInstance();
+        firebaseUser = mAuth.getCurrentUser();
 
         // get info
         dbReference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
@@ -85,6 +92,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         userImage.setOnClickListener(this);
 
         btnDone.setOnClickListener(this);
+        btnLogout.setOnClickListener(this);
     }
 
     private void openImageFolder() {
@@ -182,6 +190,13 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             }
             case R.id.tvUsername: {
+                break;
+            }
+            case R.id.btnLogout: {
+                mAuth.signOut();
+                Intent intent = new Intent(ProfileActivity.this, StartActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
                 break;
             }
 

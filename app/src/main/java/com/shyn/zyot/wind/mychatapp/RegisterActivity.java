@@ -2,16 +2,18 @@ package com.shyn.zyot.wind.mychatapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -37,7 +39,7 @@ public class RegisterActivity extends AppCompatActivity {
         // setting for toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Register");
+        getSupportActionBar().setTitle(R.string.register);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
@@ -58,11 +60,11 @@ public class RegisterActivity extends AppCompatActivity {
                 String password = edtPassword.getText().toString();
 
                 if (name.isEmpty())
-                    Toast.makeText(RegisterActivity.this, "Name must be filled", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(btnRegister, "Name must be filled", Snackbar.LENGTH_SHORT).show();
                 else if (email.isEmpty())
-                    Toast.makeText(RegisterActivity.this, "Email must be filled", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(btnRegister, "Email must be filled", Snackbar.LENGTH_SHORT).show();
                 else if (password.length() < 6)
-                    Toast.makeText(RegisterActivity.this, "Password must be longer than 6 characters", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(btnRegister, "Password must be longer than 6 characters", Snackbar.LENGTH_SHORT).show();
                 else {
                     register(name, email, password);
                 }
@@ -81,7 +83,7 @@ public class RegisterActivity extends AppCompatActivity {
                             assert firebaseUser != null;
                             String userID = firebaseUser.getUid();
 
-                            Toast.makeText(RegisterActivity.this, "Register Successfully", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(btnRegister, "Register Successfully", Snackbar.LENGTH_SHORT).show();
                             // Write database
                             dbReference = FirebaseDatabase.getInstance().getReference("Users").child(userID);
                             User user = new User(userID, name, "default", "offline", name.toLowerCase());
@@ -98,14 +100,14 @@ public class RegisterActivity extends AppCompatActivity {
                                         startActivity(intent);
                                         finish();
                                     } else {
-                                        Toast.makeText(RegisterActivity.this, "You can't register with this email and password!", Toast.LENGTH_SHORT).show();
+                                        Snackbar.make(btnRegister, "You can't register with this email and password!", Snackbar.LENGTH_SHORT).show();
                                         mAuth.signOut();
                                         firebaseUser.delete();
                                     }
                                 }
                             });
                         } else
-                            Toast.makeText(RegisterActivity.this, "Register Failed", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(btnRegister, "Register Failed", Snackbar.LENGTH_SHORT).show();
                     }
                 });
 

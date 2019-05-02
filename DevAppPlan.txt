@@ -6,6 +6,12 @@ Dev app chat plan (update 13/04/2019)
 	- when login, if the email is not verified -->  show dialog (send verify email again) for user
 
 +) edit theme for app
+    references:
+        https://www.codester.com/items/3855/instant-chat-android-source-code-and-php-backend
+        https://www.codester.com/items/12495/realtime-firebase-chat-android-source-code
+        // app thành
+        http://ec2-54-92-217-205.compute-1.amazonaws.com/?fbclid=IwAR2FEe4mS-NUYl23yB3ceq5KaHO7Np6RNvROaXO0wAFxzVXkc9MDdQPMtc8
+        
 +) bugs
 	- unread messages
 	    ./ 1 solution: create a new reference containing # unread msgs in each room (save by userid and roomid) *maybe easier*

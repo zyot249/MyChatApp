@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">MyChatApp</string>
+
+    <string name="forgot_password">Forgot your password?</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="app_title">Let\'s Chat</string>
+
+    <string name="reset_password_msg">Please enter your email to receive the reset password email</string>
+    <string name="reset_password">Reset Password</string>
 </resources>

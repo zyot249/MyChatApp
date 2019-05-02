@@ -8,4 +8,11 @@
     <color name="colorUnseenMessage">#000000</color>
 
     <color name="colorBackgroundProfile">#e5bebebe</color>
+
+    <color name="colorOrangeButton">#FF7D00</color>
+    <color name="colorBlueButton">#34495E</color>
+    <color name="colorBlueButtonOnPress">#457AAF</color>
+    <color name="colorBrownTitle">#86603E</color>
+
+    <color name="colorGreen1">#f72dfd19</color>
 </resources>
