@@ -1,11 +1,13 @@
 package com.shyn.zyot.wind.mychatapp.Fragment;
 
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -36,6 +38,7 @@ public class UserFragment extends Fragment {
     private List<User> users;
     private ValueEventListener searchEventListener;
     private Query querySearch;
+    private FirebaseUser fuser;
 
     public UserFragment() {
 
@@ -69,7 +72,7 @@ public class UserFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.toString().isEmpty()) {
-                    readUsersOnce();
+                    readUsers();
                     if (searchEventListener != null)
                         querySearch.removeEventListener(searchEventListener);
                 } else
@@ -83,32 +86,34 @@ public class UserFragment extends Fragment {
         return view;
     }
 
-    private void readUsersOnce() {
-        final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference("Users");
-        dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                users.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    User user = snapshot.getValue(User.class);
-                    if (!user.getId().equals(firebaseUser.getUid()))
-                        users.add(user);
-                }
-
-                userAdapter = new UserAdapter(getContext(), users);
-                recyclerView.setAdapter(userAdapter);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
+//    private void readUsersOnce() {
+//        final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+//        DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference("Users");
+//        dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                users.clear();
+//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                    User user = snapshot.getValue(User.class);
+//                    if (user != null && firebaseUser != null) {
+//                        if (!user.getId().equals(firebaseUser.getUid()))
+//                            users.add(user);
+//                    }
+//                }
+//
+//                userAdapter = new UserAdapter(getContext(), users);
+//                recyclerView.setAdapter(userAdapter);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+//    }
 
     private void readUsers() {
-        final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        fuser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference("Users");
         dbReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -117,7 +122,7 @@ public class UserFragment extends Fragment {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
                     if (user.getId() != null)
-                        if (!user.getId().equals(firebaseUser.getUid()))
+                        if (!user.getId().equals(fuser.getUid()))
                             users.add(user);
                 }
 
@@ -133,7 +138,7 @@ public class UserFragment extends Fragment {
     }
 
     private void searchUsers(String keyword) {
-        final FirebaseUser fuser = FirebaseAuth.getInstance().getCurrentUser();
+        fuser = FirebaseAuth.getInstance().getCurrentUser();
         querySearch = FirebaseDatabase.getInstance().getReference("Users").orderByChild("search")
                 .startAt(keyword)
                 .endAt(keyword + "\uf8ff");
