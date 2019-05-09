@@ -5,7 +5,7 @@ Dev app chat plan (update 13/04/2019)
 	- if the email is not verified --> cannot login ( check when login )
 	- when login, if the email is not verified -->  show dialog (send verify email again) for user
 
-+) edit theme for app
++) edit theme for app (v)
     references:
         https://www.codester.com/items/3855/instant-chat-android-source-code-and-php-backend
         https://www.codester.com/items/12495/realtime-firebase-chat-android-source-code
@@ -16,10 +16,10 @@ Dev app chat plan (update 13/04/2019)
 	- unread messages
 	    ./ 1 solution: create a new reference containing # unread msgs in each room (save by userid and roomid) *maybe easier*
 	- notification
-+) app more function on profile
-    - reset password (required enter current password)
-    - move "log out" function from main activity --> profile activity
-    - "change name" function
++) app more function on profile (v)
+    - reset password (required enter current password) (v)
+    - move "log out" function from main activity --> profile activity (v)
+    - "change name" function (v)
 +) In main activity
     - add "make chatting" function
         ./ choose friends --> chat

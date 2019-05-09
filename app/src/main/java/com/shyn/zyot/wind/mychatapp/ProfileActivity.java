@@ -1,8 +1,10 @@
 package com.shyn.zyot.wind.mychatapp;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.TaskStackBuilder;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 
@@ -10,9 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +25,7 @@ import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -43,6 +48,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private Button btnDone;
     private Button btnLogout;
+    private Button btnChangeName;
     private CircleImageView userImage;
     private TextView tvUsername;
 
@@ -63,6 +69,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         userImage = findViewById(R.id.userImage);
         tvUsername = findViewById(R.id.tvUsername);
         btnLogout = findViewById(R.id.btnLogout);
+        btnChangeName = findViewById(R.id.btnChangeName);
 
         stReference = FirebaseStorage.getInstance().getReference("ProfileImages");
         // get user ID from main
@@ -90,7 +97,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         // change profie image
         userImage.setOnClickListener(this);
-
+        btnChangeName.setOnClickListener(this);
         btnDone.setOnClickListener(this);
         btnLogout.setOnClickListener(this);
     }
@@ -158,6 +165,53 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
+    private void showChangeNameDialog(final String currentName) {
+        LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.change_name_dialog, null);
+        final EditText edtChangeName = dialogView.findViewById(R.id.edtChangeName);
+        edtChangeName.setHint(currentName);
+        AlertDialog dialog = new AlertDialog.Builder(ProfileActivity.this)
+                .setTitle("Change Name")
+                .setMessage("Enter your new name")
+                .setView(dialogView)
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String newName = edtChangeName.getText().toString();
+                        if (!newName.isEmpty()) {
+                            if (!newName.equals(currentName)) {
+                                dbReference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+                                HashMap<String, Object> hashMap = new HashMap<>();
+                                hashMap.put("username", newName);
+                                hashMap.put("search", newName.toLowerCase());
+                                dbReference.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful())
+                                            Snackbar.make(btnChangeName, "You've changed your name successfully!", Snackbar.LENGTH_SHORT).show();
+                                        else
+                                            Snackbar.make(btnChangeName, "Failed Action", Snackbar.LENGTH_SHORT).show();
+                                    }
+                                });
+                            } else {
+                                Snackbar.make(btnChangeName, "Your name doesn't change!", Snackbar.LENGTH_SHORT).show();
+                            }
+                        }else {
+                            Snackbar.make(btnChangeName, "Your new name can not be empty!", Snackbar.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .create();
+
+        dialog.show();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -199,7 +253,10 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 finish();
                 break;
             }
-
+            case R.id.btnChangeName: {
+                showChangeNameDialog(tvUsername.getText().toString());
+                break;
+            }
         }
     }
 }

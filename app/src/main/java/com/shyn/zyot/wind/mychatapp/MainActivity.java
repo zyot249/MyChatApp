@@ -99,64 +99,41 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // set pager adapter
+        pagerAdapter = new PagerAdapter(getSupportFragmentManager());
+        pagerAdapter.addFragment(new ChatFragment(), "Chats");
+        pagerAdapter.addFragment(new UserFragment(), "Users");
+        viewPager.setAdapter(pagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
+
+
         // unread messages
-        dbReference = FirebaseDatabase.getInstance().getReference("Messages");
-        dbReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                int cnt = countUnreadMessage();
-                pagerAdapter = new PagerAdapter(getSupportFragmentManager());
-                if (cnt == 0)
-                    pagerAdapter.addFragment(new ChatFragment(), "Chats");
-                else
-                    pagerAdapter.addFragment(new ChatFragment(), "(" + cnt + ")" + "Chats");
-                pagerAdapter.addFragment(new UserFragment(), "Users");
-                viewPager.setAdapter(pagerAdapter);
-                tabLayout.setupWithViewPager(viewPager);
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+//        dbReference = FirebaseDatabase.getInstance().getReference("Messages");
+//        dbReference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                int cnt = countUnreadMessage();
+//                pagerAdapter = new PagerAdapter(getSupportFragmentManager());
+//                if (cnt == 0)
+//                    pagerAdapter.addFragment(new ChatFragment(), "Chats");
+//                else
+//                    pagerAdapter.addFragment(new ChatFragment(), "(" + cnt + ")" + "Chats");
+//                pagerAdapter.addFragment(new UserFragment(), "Users");
+//                viewPager.setAdapter(pagerAdapter);
+//                tabLayout.setupWithViewPager(viewPager);
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
 
 
     }
 
     private int countUnreadMessage() {
-        unread = 0;
-        DatabaseReference userRooms = FirebaseDatabase.getInstance().getReference("UserRooms").child(firebaseUser.getUid());
-        userRooms.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Room room = snapshot.getValue(Room.class);
-                    DatabaseReference messages = FirebaseDatabase.getInstance().getReference("Messages").child(room.getRoomID());
-                    messages.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot snapshot1 : dataSnapshot.getChildren()) {
-                                Message message = snapshot1.getValue(Message.class);
-                                if (!message.getSentBy().equals(firebaseUser.getUid()) && !message.isSeen())
-                                    unread++;
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         return unread;
     }

@@ -48,7 +48,7 @@ public class MessageActivity extends AppCompatActivity {
     private ValueEventListener seenListener;
 
     //    ServiceAPI serviceAPI;
-    boolean notify = false;
+//    boolean notify = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
